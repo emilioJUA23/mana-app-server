@@ -69,19 +69,21 @@ app.post('/api/v1/deck', function(req, res) {
 
 app.put("/api/v1/deck/:id", (req, res) => {
     var id = req.params.id;
-    var filtered_decks = decks.decks.filter(x => x.id==id)
+    var filtered_decks = decks.decks.filter(x => x.name==id)
     console.log(filtered_decks);
     if( filtered_decks.length>0 )
     { 
         //mandar a cambiar el deck
         for(var d in decks.decks)
         {
-            if(d.name==id)
+            if(decks.decks[d].name==id)
             {
-                
-                break;
+                decks.decks[d] = req.body;
             }
         }
+        res.writeHead(200, {"Content-Type": "text/plain"});
+        res.write("ok");
+        res.end();
     }
     else
     {
