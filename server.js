@@ -31,8 +31,7 @@ app.get("/api/v1/deck/:id?", (req, res) => {
     }
     else
     {
-        var filtered_decks = decks.decks.filter(x => x.id==id)
-        console.log(filtered_decks);
+        var filtered_decks = decks.decks.filter(x => x.name==id)
         if( filtered_decks.length>0 )
         {
             res.writeHead(200, {"Content-Type": "application/json"});
@@ -52,13 +51,64 @@ app.get("/api/v1/deck/:id?", (req, res) => {
 
 app.post('/api/v1/deck', function(req, res) {
     var deck = req.body;
-    deck.id = decks.decks.length+1;
-    decks.decks.push(deck);
-    console.log(decks.decks);
-    res.writeHead(200, {"Content-Type": "application/json"});
-            res.write(JSON.stringify({status:"ok"}));
-            res.end();  
+    var filtered_decks = decks.decks.filter(x => x.name===deck.name);
+    if(filtered_decks.length>0)
+    {
+        res.writeHead(409, {"Content-Type": "text/plain"});
+        res.write("409 Conflict Item already exist");
+        res.end();
+    }
+    else
+    {
+        decks.decks.push(deck);
+        res.writeHead(200, {"Content-Type": "application/json"});
+        res.write(JSON.stringify({status:"ok"}));
+        res.end();
+    }  
 });
+
+app.put("/api/v1/deck/:id", (req, res) => {
+    var id = req.params.id;
+    var filtered_decks = decks.decks.filter(x => x.id==id)
+    console.log(filtered_decks);
+    if( filtered_decks.length>0 )
+    { 
+        //mandar a cambiar el deck
+        for(var d in decks.decks)
+        {
+            if(d.name==id)
+            {
+                
+                break;
+            }
+        }
+    }
+    else
+    {
+        res.writeHead(404, {"Content-Type": "text/plain"});
+        res.write("404 Not found");
+        res.end();
+    }
+   });
+
+   app.delete("/api/v1/deck/:id", (req, res) => {
+    var id = req.params.id;
+    var filtered_decks = decks.decks.filter(x => x.name==id)
+    if( filtered_decks.length>0 )
+        { 
+            // decks.decks.splice(x => x.id !==id)
+            decks.decks = decks.decks.filter(x => x.name!==id)
+            res.writeHead(200, {"Content-Type": "text/plain"});
+            res.write("ok");
+            res.end();
+        }
+        else
+        {
+            res.writeHead(404, {"Content-Type": "text/plain"});
+            res.write("404 Not found");
+            res.end();
+        }
+   });
 
 //levantamos el servidor
 function createServer(){
